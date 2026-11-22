@@ -2,7 +2,7 @@ import { execFile } from 'node:child_process';
 import { homedir } from 'node:os';
 import { promisify } from 'node:util';
 import { MODEL_SETTING, SETTING, type Model } from '@geordi/protocol';
-import { agentProgram } from './program.ts';
+import { agentProgram, programCommand } from './program.ts';
 import type { AgentAdapter } from './adapter.ts';
 
 const run = promisify(execFile);
@@ -42,14 +42,16 @@ export const opencode: AgentAdapter = {
 		const program = agentProgram('opencode');
 		if (!program) return { models: [], efforts: [] };
 		// Older CLIs and large catalogs can still provide the compact model list.
-		for (const args of [['models', '--verbose'], ['models']]) {
+		for (const flags of [['models', '--verbose'], ['models']]) {
 			try {
-				const { stdout } = await run(program, args, {
+				const command = programCommand(program, flags);
+				const { stdout } = await run(command.file, command.args, {
 					cwd: homedir(),
 					timeout: 5000,
 					maxBuffer: 16 * 1024 * 1024,
 					killSignal: 'SIGKILL',
-					windowsHide: true
+					windowsHide: true,
+					...command.options
 				});
 				return { models: modelsIn(stdout), efforts: [] };
 			} catch {

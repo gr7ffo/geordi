@@ -227,7 +227,8 @@ async function until(what: () => boolean, ms = 8000) {
 }
 
 const started: Session[] = [];
-afterAll(() => started.forEach((session) => session.kill()));
+// Windows kills a process tree one command at a time: give it room.
+afterAll(() => started.forEach((session) => session.kill()), 60_000);
 
 /** A session with what it has reported so far, and a way to wait for a report. */
 function begin(
@@ -378,6 +379,21 @@ describe('a session', () => {
 		await ended(1);
 		expect(session.live().sessionModel).toEqual({ requested: {}, model: 'provider/other-model' });
 	});
+
+	it.skipIf(process.platform !== 'win32')(
+		'finds OpenCode when Windows spells PATH in its own case',
+		async () => {
+			// The daemon reads `process.env`, which ignores case; the host is handed a copy, which
+			// says `Path` and found nothing, though Settings said OpenCode was there.
+			const dir = mkdtempSync(join(tmpdir(), 'geordi-path-'));
+			writeFileSync(join(dir, 'opencode.cmd'), '@echo off\r\n');
+			const launch = meta({ Path: dir });
+			launch.agent = 'opencode';
+			const { events, ended } = begin('Hello', { launch });
+			await ended(1);
+			expect(events.at(-1)).toEqual({ kind: 'turn.completed' });
+		}
+	);
 
 	it('declines a tool permission request without asking the person', async () => {
 		const { events, ended } = begin('permission');
