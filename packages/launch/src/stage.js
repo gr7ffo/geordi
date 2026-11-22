@@ -6,13 +6,18 @@ import { build } from 'esbuild';
 
 const repo = join(import.meta.dirname, '../../..');
 
-/** Runs pnpm in the repository. */
+/**
+ * Runs pnpm in the repository. Windows cannot start pnpm's own script file (`npm_execpath`,
+ * a `.cjs`), and its `pnpm` on PATH is a `.cmd`: both only start through `cmd.exe`, which
+ * finds whatever installation of pnpm is there.
+ */
 export const pnpm = (/** @type {string[]} */ args) =>
-	execFileSync(
-		process.platform === 'win32' ? process.env.npm_execpath || 'pnpm.exe' : 'pnpm',
-		args,
-		{ cwd: repo, stdio: 'inherit' }
-	);
+	process.platform === 'win32'
+		? execFileSync(process.env.ComSpec || 'cmd.exe', ['/d', '/s', '/c', 'pnpm', ...args], {
+				cwd: repo,
+				stdio: 'inherit'
+			})
+		: execFileSync('pnpm', args, { cwd: repo, stdio: 'inherit' });
 
 /** For the CommonJS among what is bundled. */
 const banner = {

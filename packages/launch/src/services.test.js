@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import { pnpm } from './stage.js';
 import { services } from './services.js';
+
+test('runs pnpm on this platform', () => {
+	// On Windows pnpm is a `.cmd`, which starts only through cmd.exe: this fails there if broken.
+	assert.doesNotThrow(() => pnpm(['--version']));
+});
 
 test('wires forge and daemon to each other, on loopback', () => {
 	const { forge, daemon } = services({ web: 1, daemon: 2, live: 3, origin: 'http://localhost:1' });
