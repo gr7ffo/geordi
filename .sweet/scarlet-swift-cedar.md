@@ -1,5 +1,0 @@
----
-type: fix
----
-
-Your messages now have a light gray background in light mode.
