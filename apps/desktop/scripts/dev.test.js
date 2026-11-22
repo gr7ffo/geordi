@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { join } from 'node:path';
 import { devEnvironment } from './dev.js';
 import { desktopRuntime } from '../src/runtime.js';
 
@@ -21,10 +22,12 @@ test('uses assigned spare ports across blocks, excluding retired job assignments
 	assert.equal(result.GEORDI_LIVE_PORT, '24003');
 	assert.equal(result.ELECTRON_RUN_AS_NODE, undefined);
 	const runtime = desktopRuntime(result);
-	assert.equal(runtime.profile, '/workspace/.data/desktop/profile');
+	// where the dev app's files go, in the platform's own spelling
+	const desktop = join('/workspace', '.data/desktop');
+	assert.equal(runtime.profile, join(desktop, 'profile'));
 	assert.equal(runtime.env.GEORDI_DAEMON_TOKEN, '');
 	for (const [key, value] of Object.entries(runtime.env)) {
-		if (key !== 'GEORDI_DAEMON_TOKEN') assert.ok(value.startsWith('/workspace/.data/desktop'));
+		if (key !== 'GEORDI_DAEMON_TOKEN') assert.ok(value.startsWith(desktop));
 	}
 });
 

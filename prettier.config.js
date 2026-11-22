@@ -4,6 +4,8 @@ const config = {
 	singleQuote: true,
 	trailingComma: 'none',
 	printWidth: 100,
+	// Windows checkouts hold CRLF (core.autocrlf); keep whatever a file already has.
+	endOfLine: 'auto',
 	plugins: ['prettier-plugin-svelte', 'prettier-plugin-astro', 'prettier-plugin-tailwindcss'],
 	overrides: [
 		{ files: '*.svelte', options: { parser: 'svelte' } },

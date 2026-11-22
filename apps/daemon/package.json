@@ -4,7 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"acp:probe": "node scripts/acp-probe.mjs",
-		"dev": "GEORDI_DAEMON_TOKEN_FILE=../../.data/daemon-token GEORDI_SESSIONS_DIR=../../.data/sessions GEORDI_PROJECTS_DIR=../../.data/projects GEORDI_FORGE_HTTP_URL=http://localhost:5173 node --watch src/main.ts",
+		"dev": "GEORDI_WORKTREES_DIR=../../.data/worktrees GEORDI_DAEMON_TOKEN_FILE=../../.data/daemon-token GEORDI_SESSIONS_DIR=../../.data/sessions GEORDI_PROJECTS_DIR=../../.data/projects GEORDI_FORGE_HTTP_URL=http://localhost:5173 node --watch src/main.ts",
 		"start": "node src/main.ts",
 		"check": "tsc",
 		"test": "vitest --run"
